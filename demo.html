@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrollPathLine — drag demo</title>
+<style>
+  :root { color-scheme: dark; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0d10; font-family: system-ui, sans-serif; color: #eee; }
+
+  /* The line is drawn over this stage. Its scroll height is set by the
+     library via the scrollLength option (see below); you can still drag the
+     blocks anywhere on it. */
+  #stage { position: relative; width: 100%; }
+
+  .card {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: #1b1b22; border: 1px solid #2c2c38; border-radius: 10px;
+    padding: .45rem .7rem; white-space: nowrap; text-align: center; line-height: 1.2;
+    cursor: grab; user-select: none; touch-action: none;
+  }
+  .card.dragging { cursor: grabbing; border-color: #ffd400; z-index: 10; }
+  .card b { color: #ffd400; font-size: 1rem; }
+  .card span { display: block; font-size: .7rem; color: #888; }
+
+  .hint { position: fixed; top: 1rem; left: 1rem; font-size: .85rem; color: #777; }
+
+  /* Nav button: also a waypoint (data-line), so the line ends on it. */
+  .nav-btn {
+    position: absolute; transform: translate(-50%, -50%);
+    background: #1b1b22; border: 1px solid #ffd400; border-radius: 10px;
+    padding: .5rem .9rem; color: #ffd400; text-decoration: none;
+    white-space: nowrap; z-index: 10;
+  }
+</style>
+</head>
+<body>
+  <div class="hint">scroll ↓ &nbsp;·&nbsp; drag the blocks to test the line angles</div>
+
+  <!-- Hand-written waypoints. Just move them around with the mouse.
+       The data-line VALUE sets the connection order, so the line follows
+       1 -> 2 -> 3 ... regardless of where the blocks sit on the page. -->
+  <div id="stage">
+    <div class="card" data-line="1" style="left: 50%; top: 5%;"><b>1</b><span>drag me</span></div>
+    <div class="card" data-line="4" style="left: 25%; top: 22%;"><b>4</b><span>drag me</span></div>
+    <div class="card" data-line="2" style="left: 75%; top: 40%;"><b>2</b><span>drag me</span></div>
+    <div class="card" data-line="5" style="left: 30%; top: 58%;"><b>5</b><span>drag me</span></div>
+    <div class="card" data-line="3" style="left: 70%; top: 76%;"><b>3</b><span>drag me</span></div>
+    <div class="card" data-line="6" style="left: 50%; top: 94%;"><b>6</b><span>drag me</span></div>
+    <a class="nav-btn" data-line="7" href="index.html" style="left: 50%; top: 99%;">← Back to minimal</a>
+  </div>
+
+  <!-- 1. Load the library (exposes window.ScrollPathLine). -->
+  <script src="scroll-path-line.js"></script>
+
+  <script>
+    // 2. Initialise the line over the stage.
+    var line = new ScrollPathLine({
+      container: '#stage',
+      color: '#ffd400',
+      width: 6,
+      dash: '22 16',     // set to '' for a solid line
+      smooth: 0.22,      // higher = rounder bends
+      scrollLength: 3    // scroll area = 3 viewport heights; raise to draw slower
+    });
+
+    // 3. Make every card draggable. While dragging we move it by setting
+    //    left/top in px, then call line.refresh() so the line follows live.
+    var stage = document.getElementById('stage');
+
+    function startDrag(card, startEvent) {
+      startEvent.preventDefault();
+      card.classList.add('dragging');
+
+      var rect = card.getBoundingClientRect();
+      // Offset of the pointer inside the card (card is centred via translate).
+      var grabX = startEvent.clientX - (rect.left + rect.width / 2);
+      var grabY = startEvent.clientY - (rect.top + rect.height / 2);
+
+      function onMove(e) {
+        // Re-measure each move so it stays correct even if the page scrolls.
+        var stageRect = stage.getBoundingClientRect();
+        var x = e.clientX - stageRect.left - grabX;
+        var y = e.clientY - stageRect.top - grabY;
+        card.style.left = x + 'px';
+        card.style.top = y + 'px';
+        line.refresh();   // redraw the line through the new positions
+      }
+
+      function onUp() {
+        card.classList.remove('dragging');
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+      }
+
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+    }
+
+    stage.querySelectorAll('.card').forEach(function (card) {
+      card.addEventListener('pointerdown', function (e) { startDrag(card, e); });
+    });
+  </script>
+</body>
+</html>

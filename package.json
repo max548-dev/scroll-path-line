@@ -1,0 +1,20 @@
+{
+  "name": "scroll-path-line",
+  "version": "1.0.0",
+  "description": "A dependency-free, scroll-driven SVG line that snakes through anchor elements and draws itself as you scroll.",
+  "main": "scroll-path-line.js",
+  "license": "MIT",
+  "keywords": [
+    "svg",
+    "scroll",
+    "scroll-animation",
+    "path",
+    "draw",
+    "vanilla-js",
+    "no-dependencies"
+  ],
+  "files": [
+    "scroll-path-line.js",
+    "README.md"
+  ]
+}

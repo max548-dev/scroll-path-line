@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrollPathLine</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0d0d10; color: #eee; }
+
+  /* Waypoints: any element tagged with data-line. Big margins make the page
+     scroll; alternating sides let the line snake. */
+  .step {
+    width: max-content; padding: .6rem 1rem; margin: 45vh 0;
+    background: #1b1b22; border: 1px solid #2c2c38; border-radius: 10px;
+  }
+  .step:nth-child(odd)  { margin-left: 20%; }
+  .step:nth-child(even) { margin-left: auto; margin-right: 20%; }
+
+  /* The nav button is just another waypoint, so the line ends on it. */
+  a.step { text-decoration: none; color: #ffd400; border-color: #ffd400; }
+</style>
+</head>
+<body>
+  <div class="step" data-line>Step one</div>
+  <div class="step" data-line>Step two</div>
+  <div class="step" data-line>Step three</div>
+  <div class="step" data-line>Step four</div>
+  <a class="step" data-line href="demo.html">Open drag demo →</a>
+
+  <!-- Load the library and draw the line with all default options. -->
+  <script src="scroll-path-line.js"></script>
+  <script>
+    new ScrollPathLine();
+  </script>
+</body>
+</html>
